@@ -17,14 +17,14 @@ const ItemSchema=new mongoose.Schema({
 const Item =  mongoose.model("Item",ItemSchema);
 
 const Item1 = new Item({
-  name:"1"
+  name:"I love coding!"
 });
 
 const Item2= new Item({
-  name:"2"
+  name:"Nice Weather!"
 });
 const Item3 = new Item({
-  name:"3"
+  name:"Have a great day!"
 });
 
 const defaultItems =[Item1,Item2,Item3];
@@ -36,10 +36,7 @@ const ListSchema=new mongoose.Schema({
 
 const List =  mongoose.model("List",ListSchema);
 
-
-
-
-let day = date.getdate();
+//let day = date.getdate();
 
 app.get("/",function(req,res){
 Item.find({},function(err,foundItems){
@@ -49,13 +46,13 @@ Item.find({},function(err,foundItems){
         if(err){
           console.log("error");
         }else{
-      res.redirect("/");
+          res.redirect("/");
+        }
+      });
+    }else{
+      res.render("list",{listtitle:"Today",newListItems:foundItems});//与ejs里面变量名字相同
     }
-    })
-  }else{
-    res.render("list",{listtitle:"Today",newListItems:foundItems});//与ejs里面变量名字相同
-  }
-});
+  });
 });
 
 
@@ -71,32 +68,29 @@ app.get("/:customListName",function(req,res){
         list.save();
         res.redirect("/"+customListName);
       }else{
-          res.render("list",{listtitle:foundList.name,newListItems:foundList.items});//与ejs里面变量名字相同
+        res.render("list",{listtitle:foundList.name,newListItems:foundList.items});//与ejs里面变量名字相同
       }
     }
   })
-
-
 });
 
 app.post("/",function(req,res){
-
-const itemName=req.body.newItem;
-const listName = req.body.list;
-const item = new Item({
-  name :itemName
-});
-console.log(listName);
-if(listName==="Today"){
-  item.save();
-  res.redirect("/");
-}else{
-   List.findOne({name:listName},function(err,foundList){
-     foundList.items.push(item);
-     foundList.save();
+  const itemName=req.body.newItem;
+  const listName = req.body.list;
+  const item = new Item({
+    name :itemName
+  });
+  console.log(listName);
+  if(listName==="Today"){
+    item.save();
+    res.redirect("/");
+  }else{
+    List.findOne({name:listName},function(err,foundList){
+      foundList.items.push(item);
+      foundList.save();
       res.redirect("/"+listName);
-   })
- }
+    })
+  }
 });
 
 app.post("/delete",function(req,res){
@@ -120,16 +114,8 @@ app.post("/delete",function(req,res){
 
 
 
-app.get("/about",function(req,res){
-  res.render("about");
-})
-
 let port = process.env.PORT;
 if (port == null || port == "") {
   port = 3000;
 }
 app.listen(port);
-
-app.listen(3000,function(){
-  console.log("server on port 3000");
-});
